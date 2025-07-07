@@ -15,7 +15,7 @@ bool servoState = true;  // Global servo state (on or off position)
 
 void setup() {
   myservo.attach(MYSERVO_PIN);
-  pinMode(BUTTON_PIN, INPUT_PULLUP);
+  pinMode(BUTTON_PIN, INPUT);
 }
 
 void loop() {
