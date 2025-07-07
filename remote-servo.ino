@@ -9,19 +9,18 @@ bool servoState = true;  // Global servo state (on or off position)
 
 // Button variables
 #define BUTTON_PIN 2
-#define BUTTON_DELAY_MS 1000 // Time to freeze execution after button press
-
+#define BUTTON_DELAY_MS 1000  // Time to freeze execution after button press
 
 
 void setup() {
   myservo.attach(MYSERVO_PIN);
-  pinMode(BUTTON_PIN, INPUT);
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
 }
 
 void loop() {
   bool buttonState = digitalRead(BUTTON_PIN);
 
-  if (buttonState == HIGH) {
+  if (buttonState == LOW) {
     toggle_servo();
     delay(BUTTON_DELAY_MS);
   }
