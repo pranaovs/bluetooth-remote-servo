@@ -1,4 +1,7 @@
 #include <Servo.h>
+#include <SoftwareSerial.h>
+
+#define SERIAL_BAUD 9600
 
 // Servo variables
 #define MYSERVO_PIN 9
@@ -7,21 +10,29 @@
 Servo myservo;
 bool servoState = false;  // Global servo state (on or off position)
 
+// Bluetooth variables
+SoftwareSerial bt(2, 3);  // (Rx, Tx)
+#define BLUETOOTH_BAUD 38400
+#define BT_SIGNAL_ON '1'
+#define BT_SIGNAL_OFF '0'
+
 // Button variables
-#define BUTTON_PIN 2
+#define BUTTON_PIN 4
 #define BUTTON_RELEASE_CHECK_MS 10  // Time to wait to check if button is released
 #define BUTTON_DELAY_MS 2000  // Time to wait after button press
 
 // Setup Logic
 void setup() {
 
-  Serial.begin(9600);
+  Serial.begin(SERIAL_BAUD);
   Serial.println("Started");
 
   pinMode(BUTTON_PIN, INPUT_PULLUP);
 
   myservo.attach(MYSERVO_PIN);
   myservo.write(OFF_POS);
+
+  bt.begin(BLUETOOTH_BAUD);
 
   Serial.println("Initialized!");
 }
@@ -32,6 +43,25 @@ void loop() {
 
   if (buttonState == LOW) {  // LOW because INPUT_PULLUP
     button_press(buttonState);
+  }
+
+  // Bluetooth handling
+  if (bt.available()) {
+    char bt_input = bt.read();
+
+    if (bt_input != '\r' && bt_input != '\n' && bt_input != ' ') {
+      Serial.print("BLUETOOTH: recieved -> ");
+      Serial.println(bt_input);
+    }
+
+    switch (bt_input) {
+      case BT_SIGNAL_OFF:
+        switch_servo(false);
+        break;
+      case BT_SIGNAL_ON:
+        switch_servo(true);
+        break;
+    }
   }
 }
 
