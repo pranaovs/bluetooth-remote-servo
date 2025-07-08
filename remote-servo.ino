@@ -2,24 +2,25 @@
 #include <SoftwareSerial.h>
 
 #define SERIAL_BAUD 9600
-
-// Servo variables
-#define MYSERVO_PIN 9
-#define OFF_POS 0
-#define ON_POS 10
-Servo myservo;
 bool servoState = false;  // Global servo state (on or off position)
 
 // Bluetooth variables
 SoftwareSerial bt(2, 3);  // (Rx, Tx)
 #define BLUETOOTH_BAUD 38400
-#define BT_SIGNAL_ON '1'
 #define BT_SIGNAL_OFF '0'
+#define BT_SIGNAL_ON '1'
+#define BT_SIGNAL_TOGGLE '2'
+
+// Servo variables
+#define MYSERVO_PIN 9
+#define OFF_POS 0
+#define ON_POS 100
+Servo myservo;
 
 // Button variables
 #define BUTTON_PIN 4
 #define BUTTON_RELEASE_CHECK_MS 10  // Time to wait to check if button is released
-#define BUTTON_DELAY_MS 2000  // Time to wait after button press
+#define BUTTON_DELAY_MS 2000        // Time to wait after button press
 
 // Setup Logic
 void setup() {
@@ -44,26 +45,37 @@ void loop() {
   bool buttonState = digitalRead(BUTTON_PIN);
 
   if (buttonState == LOW) {  // LOW because INPUT_PULLUP
-    button_press(buttonState);
+    handle_button_press(buttonState);
   }
 
   // Bluetooth handling
   if (bt.available()) {
-    char bt_input = bt.read();
+    handle_bluetooth_signal(bt.read());
+  }
+}
 
-    if (bt_input != '\r' && bt_input != '\n' && bt_input != ' ') {
-      Serial.print("BLUETOOTH: recieved -> ");
-      Serial.println(bt_input);
-    }
+/* Function called when a bluetooth signal is recieved
+ * Use the switch-case to handle signals
+ * Arguments: char (signal from serial)
+ * Returns: None
+ */
+void handle_bluetooth_signal(char signal) {
 
-    switch (bt_input) {
-      case BT_SIGNAL_OFF:
-        switch_servo(false);
-        break;
-      case BT_SIGNAL_ON:
-        switch_servo(true);
-        break;
-    }
+  if (signal != '\r' && signal != '\n' && signal != ' ') {
+    Serial.print("BLUETOOTH: recieved -> ");
+    Serial.println(signal);
+  }
+
+  switch (signal) {
+    case BT_SIGNAL_OFF:
+      switch_servo(false);
+      break;
+    case BT_SIGNAL_ON:
+      switch_servo(true);
+      break;
+    case BT_SIGNAL_TOGGLE:
+      toggle_servo();
+      break;
   }
 }
 
@@ -72,7 +84,7 @@ void loop() {
  * Returns: None
  * Note: blocks code execution until button is released
  */
-void button_press(bool state) {
+void handle_button_press(bool state) {
   Serial.print("BUTTON ");
   Serial.print(BUTTON_PIN);
   Serial.println(": pressed");
