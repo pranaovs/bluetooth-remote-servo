@@ -1,8 +1,9 @@
+#include <EEPROM.h>
 #include <Servo.h>
 #include <SoftwareSerial.h>
 
 #define SERIAL_BAUD 9600
-bool servoState = false;  // Global servo state (on or off position)
+#define EEPROM_ADDR 0
 
 // Bluetooth variables
 SoftwareSerial bt(2, 3);  // (Rx, Tx)
@@ -10,12 +11,14 @@ SoftwareSerial bt(2, 3);  // (Rx, Tx)
 #define BT_SIGNAL_OFF '0'
 #define BT_SIGNAL_ON '1'
 #define BT_SIGNAL_TOGGLE '2'
+#define BT_SIGNAL_EEPROM_CLEAR '3'
 
 // Servo variables
 #define MYSERVO_PIN 9
 #define OFF_POS 0
 #define ON_POS 100
 Servo myservo;
+bool servoState;  // Global servo state (on or off position)
 
 // Button variables
 #define BUTTON_PIN 4
@@ -32,6 +35,14 @@ void setup() {
 
   myservo.attach(MYSERVO_PIN);
   myservo.write(OFF_POS);
+
+  EEPROM.get(EEPROM_ADDR, servoState);
+  if (servoState == true) {
+    switch_servo(true);
+  }
+  else {
+    switch_servo(false);
+  }
 
   bt.begin(BLUETOOTH_BAUD);
 
@@ -76,6 +87,12 @@ void handle_bluetooth_signal(char signal) {
     case BT_SIGNAL_TOGGLE:
       toggle_servo();
       break;
+    case BT_SIGNAL_EEPROM_CLEAR:
+      Serial.println("EEPROM: clearing");
+      for (int i = 0; i < EEPROM.length(); i++) {
+        EEPROM.write(i, 0);
+      }
+      Serial.println("EEPROM: cleared");
   }
 }
 
@@ -127,6 +144,7 @@ void switch_servo(bool state) {
   } else {
     myservo.write(OFF_POS);
   }
+  EEPROM.write(EEPROM_ADDR, state);
 
   Serial.print("SERVO: set -> ");
   Serial.println(state);
