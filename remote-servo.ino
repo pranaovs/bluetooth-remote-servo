@@ -11,19 +11,38 @@ bool servoState = true;  // Global servo state (on or off position)
 #define BUTTON_PIN 2
 #define BUTTON_DELAY_MS 1000  // Time to freeze execution after button press
 
-
+// Setup Logic
 void setup() {
+
+  Serial.begin(9600);
+  Serial.println("Started");
+
   myservo.attach(MYSERVO_PIN);
   pinMode(BUTTON_PIN, INPUT_PULLUP);
+
+  Serial.println("Initialized!");
 }
 
+// Loop logic (main code)
 void loop() {
   bool buttonState = digitalRead(BUTTON_PIN);
 
-  if (buttonState == LOW) {
-    toggle_servo();
+  if (buttonState == LOW) {  // LOW because INPUT_PULLUP
+    button_press();
     delay(BUTTON_DELAY_MS);
   }
+}
+
+/* Function called when the button is pressed
+ * Arguments: None
+ * Returns: None
+ */
+void button_press() {
+  Serial.println("Button ");
+  Serial.print(BUTTON_PIN);
+  Serial.println(" pressed");
+
+  toggle_servo();
 }
 
 /*
@@ -33,7 +52,10 @@ void loop() {
  */
 bool toggle_servo() {
   servoState = !servoState;
+  Serial.print("Toggling servo to: ");
+  Serial.println(servoState);
   switch_servo(servoState);
+
   return servoState;
 }
 
@@ -45,8 +67,10 @@ void switch_servo(bool state) {
   if (state == true) {
     myservo.write(ON_POS);
   }
-
   else {
     myservo.write(OFF_POS);
   }
+
+  Serial.print("Servo set to: ");
+  Serial.println(state);
 }
