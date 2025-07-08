@@ -39,6 +39,8 @@ void setup() {
 
 // Loop logic (main code)
 void loop() {
+
+  // Button handling
   bool buttonState = digitalRead(BUTTON_PIN);
 
   if (buttonState == LOW) {  // LOW because INPUT_PULLUP
@@ -71,9 +73,9 @@ void loop() {
  * Note: blocks code execution until button is released
  */
 void button_press(bool state) {
-  Serial.print("Button ");
+  Serial.print("BUTTON ");
   Serial.print(BUTTON_PIN);
-  Serial.println(" pressed");
+  Serial.println(": pressed");
 
   // Button press action
   toggle_servo();
@@ -83,21 +85,20 @@ void button_press(bool state) {
     delay(BUTTON_RELEASE_CHECK_MS);
   }
 
-  Serial.print("Button ");
+  Serial.print("BUTTON ");
   Serial.print(BUTTON_PIN);
-  Serial.println(" released");
+  Serial.println(": released");
 
   delay(BUTTON_DELAY_MS);
 }
 
-/*
- * Toggle the servo states
+/* Toggle the servo states
  * Arguments: None
  * Returns: bool (new state)
  */
 bool toggle_servo() {
   servoState = !servoState;
-  Serial.print("Toggling servo to: ");
+  Serial.print("SERVO: toggle -> ");
   Serial.println(servoState);
   switch_servo(servoState);
 
@@ -115,6 +116,6 @@ void switch_servo(bool state) {
     myservo.write(OFF_POS);
   }
 
-  Serial.print("Servo set to: ");
+  Serial.print("SERVO: set -> ");
   Serial.println(state);
 }
