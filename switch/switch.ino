@@ -6,7 +6,7 @@
 #define EEPROM_ADDR 0
 
 // Bluetooth variables
-SoftwareSerial bt(2, 3);  // (Rx, Tx)
+SoftwareSerial bt(2, 3);  // (Tx, Rx) of BT
 #define BLUETOOTH_BAUD 38400
 #define BT_SIGNAL_OFF '0'
 #define BT_SIGNAL_ON '1'
