@@ -29,7 +29,7 @@ bool servoState;  // Global servo state (on or off position)
 void setup() {
 
   Serial.begin(SERIAL_BAUD);
-  Serial.println("Started");
+  Serial.println("Started switch");
 
   pinMode(BUTTON_PIN, INPUT_PULLUP);
 
@@ -46,7 +46,7 @@ void setup() {
 
   bt.begin(BLUETOOTH_BAUD);
 
-  Serial.println("Initialized!");
+  Serial.println("Initialized switch!");
 }
 
 // Loop logic (main code)
